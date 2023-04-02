@@ -22,7 +22,7 @@ public class Baloot {
         return instance;
     }
 
-    public String getLoggedInStudent() {
+    public String getLoggedInUser() {
         return db.getLoggedInUser();
     }
 
