@@ -12,7 +12,6 @@ public class ProviderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String providerId = request.getPathInfo().substring(1);
-        System.out.println(providerId);
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
             request.getRequestDispatcher(String.format("/provider.jsp?provider_id=%s",request.getPathInfo().substring(1))).forward(request, response);
