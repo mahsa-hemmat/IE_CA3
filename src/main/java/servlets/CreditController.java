@@ -11,18 +11,24 @@ import java.io.IOException;
 public class CreditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("credit.jsp");
-        requestDispatcher.forward(request, response);
+        Baloot baloot = Baloot.getInstance();
+        if (baloot.hasAnyUserLoggedIn()) {
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("credit.jsp");
+            requestDispatcher.forward(request, response);
+        } else {
+            response.sendRedirect("http://localhost:8080/login");
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String credit = request.getParameter("credit");
+        int credit = Integer.parseInt(request.getParameter("credit"));
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
-            //if(credit < 0)
-            //    response.sendRedirect("http://localhost:8080/error");
-            baloot.increaseCredit(Integer.parseInt(credit));
+            if(credit < 0)
+                throw new ServletException("Credit cannot be negative!");
+            baloot.increaseCredit(credit);
+            response.sendRedirect("http://localhost:8080/credit");
         } else {
             response.sendRedirect("http://localhost:8080/login");
         }

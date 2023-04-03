@@ -60,7 +60,7 @@ public class Provider {
     }
 
     public double getRating(){
-        return rating;
+        return (double) (Math.floor(rating * 100) / 100);
     }
 
 }

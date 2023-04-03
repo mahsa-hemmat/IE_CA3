@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class BuyList {
     private Map<Integer, Commodity> commodities;
+    int discount = 0;
 
     public Map<Integer, Commodity> getCommodities() {
         return commodities;
@@ -35,10 +36,15 @@ public class BuyList {
     }
 
     public int getTotalCost() {
-        int totalPrice=0;
+        int totalPrice = 0;
         for(Commodity co:commodities.values()){
-            totalPrice+=co.getPrice();
+            totalPrice += co.getPrice();
         }
+        totalPrice -= (discount/100) * totalPrice;
         return totalPrice;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 }

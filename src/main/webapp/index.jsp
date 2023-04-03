@@ -5,7 +5,7 @@
 </head>
 <body>
 <ul>
-    <li id="email">username: <%=Baloot.getInstance().getLoggedInUser()%></li>
+    <li id="email">username: <%=Baloot.getInstance().getLoggedInUser().getUsername()%></li>
     <li>
         <a href="/commodities">Commodities</a>
     </li>

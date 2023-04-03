@@ -86,9 +86,6 @@ public class DataBase {
         users.get(loggedInUser.getUsername()).increaseCredit(amount);
     }
 
-    public void getCommoditiesList(JsonNode data) throws Exception{
-
-    }
     public void rateCommodity(JsonNode data) throws Exception{
         System.out.println(data.get("score").asInt());
         if( (data.get("score").asInt()<1) || (data.get("score").asInt() > 10))
@@ -133,9 +130,6 @@ public class DataBase {
     public void voteComment(String id, int vote) throws Exception {
         commodities.voteComment(id,vote);
     }
-    public void getBuyList(JsonNode data) throws Exception{
-
-    }
 
     public void addComment(List<Comment> comments) throws Exception {
         for(int i = 0; i<comments.size() ; i++){
@@ -170,8 +164,8 @@ public class DataBase {
         loggedInUser = null;
     }
 
-    public String getLoggedInUser(){
-        return loggedInUser.getUsername();
+    public User getLoggedInUser(){
+        return loggedInUser;
     }
 
     public Boolean hasAnyUserLoggedIn() {
@@ -180,7 +174,14 @@ public class DataBase {
         return true;
     }
 
-    public void purchase(String username) throws Exception {
-        users.get(username).completePurchase();
+    public void purchase() throws Exception {
+        loggedInUser.completePurchase();
+    }
+
+    public void addDiscount(List<Discount> discounts) {
+        for(User user: users.values()){
+            for (Discount discount : discounts)
+                user.addDiscount(discount);
+        }
     }
 }

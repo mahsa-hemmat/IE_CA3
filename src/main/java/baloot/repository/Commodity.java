@@ -92,7 +92,7 @@ public class Commodity {
     }
 
     public double getRating(){
-        return rating;
+        return (double) (Math.floor(rating * 100) / 100);
     }
 
     public void setRating(double rating){

@@ -7,15 +7,18 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 
-@WebServlet(name = "LogoutController", value = "/logout")
-public class LogoutController extends HttpServlet {
+@WebServlet(name = "ProviderController", value = "/providers/*")
+public class ProviderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String providerId = request.getPathInfo().substring(1);
+        System.out.println(providerId);
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
-            baloot.logOutUser();
+            request.getRequestDispatcher(String.format("/provider.jsp?provider_id=%s",request.getPathInfo().substring(1))).forward(request, response);
+        } else {
+            response.sendRedirect("http://localhost:8080/login");
         }
-        response.sendRedirect("http://localhost:8080/login");
     }
 
     @Override

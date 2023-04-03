@@ -14,7 +14,7 @@ import java.net.*;
 import java.util.List;
 
 
-@WebServlet(name = "HomeController", urlPatterns = "")
+@WebServlet(name = "HomeController", value = "")
 public class HomeController extends HttpServlet {
     @Override
     public void init() throws ServletException {
@@ -22,12 +22,14 @@ public class HomeController extends HttpServlet {
         final String COMMODITIES_URL = "http://5.253.25.110:5000/api/commodities";
         final String PROVIDERS_URL = "http://5.253.25.110:5000/api/providers";
         final String COMMENTS_URL = "http://5.253.25.110:5000/api/comments";
+        final String Discount_URL = "http://5.253.25.110:5000/api/discount";
         try {
             List<User> users = importUsers(USERS_URL);
             List<Provider> providers = importProviders(PROVIDERS_URL);
             List<Commodity> commodities = importCommodities(COMMODITIES_URL);
             List<Comment> comments =  importComments(COMMENTS_URL);
-            Baloot.getInstance().addData(users, providers, commodities, comments);
+            List<Discount> discounts =  importDiscounts(Discount_URL);
+            Baloot.getInstance().addData(users, providers, commodities, comments, discounts);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -48,6 +50,12 @@ public class HomeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+    private List<Discount> importDiscounts(String Discount_URL) throws Exception{
+        String strJsonData = getData(Discount_URL);
+        ObjectMapper mapper = new ObjectMapper();
+        return  mapper.readValue(strJsonData, new TypeReference<List<Discount>>(){});
     }
 
     private List<Comment> importComments(String comments_url) throws Exception{

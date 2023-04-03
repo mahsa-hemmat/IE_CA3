@@ -17,7 +17,7 @@ public class LoginController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("uesrname");
+        String name = request.getParameter("username");
         String password = request.getParameter("Password");
         Baloot baloot = Baloot.getInstance();
         if (baloot.isUserValid(name)) {

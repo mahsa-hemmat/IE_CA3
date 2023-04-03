@@ -22,7 +22,7 @@ public class Baloot {
         return instance;
     }
 
-    public String getLoggedInUser() {
+    public User getLoggedInUser() {
         return db.getLoggedInUser();
     }
 
@@ -39,11 +39,16 @@ public class Baloot {
     }
     public void logOutUser(){db.logOutUser();}
 
-    public void addData(List<User> users, List<Provider> providers, List<Commodity> commodities, List<Comment> comments) throws Exception {
+    public void addData(List<User> users, List<Provider> providers, List<Commodity> commodities, List<Comment> comments, List<Discount> discounts) throws Exception {
         db.addUser(users);
         db.addProvider(providers);
         db.addCommodity(commodities);
         db.addComment(comments);
+        db.addDiscount(discounts);
     }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
+
+    public Provider getProvider(int id) throws Exception {
+        return db.getProviderById(id);
+    }
 }
