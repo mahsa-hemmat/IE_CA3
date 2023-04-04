@@ -25,10 +25,14 @@ public class CreditController extends HttpServlet {
         int credit = Integer.parseInt(request.getParameter("credit"));
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
-            if(credit < 0)
-                throw new ServletException("Credit cannot be negative!");
-            baloot.increaseCredit(credit);
-            response.sendRedirect("http://localhost:8080/credit");
+            if(credit < 0) {
+                request.setAttribute("error", "Credit Cannot Be Negative");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+            }
+            else {
+                baloot.increaseCredit(credit);
+                response.sendRedirect("http://localhost:8080/credit");
+            }
         } else {
             response.sendRedirect("http://localhost:8080/login");
         }

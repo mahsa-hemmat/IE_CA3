@@ -13,8 +13,7 @@ public class BuyListController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("buyList.jsp");
-            requestDispatcher.forward(request, response);
+            request.getRequestDispatcher("buyList.jsp").forward(request, response);
         } else {
             response.sendRedirect("http://localhost:8080/login");
         }
@@ -32,7 +31,9 @@ public class BuyListController extends HttpServlet {
                 baloot.getLoggedInUser().getBuyList().removeCommodity(Integer.parseInt(request.getParameter("commodityId")));
             response.sendRedirect("http://localhost:8080/buyList");
         } catch (Exception e) {
-                e.printStackTrace();
+            e.printStackTrace();
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 }

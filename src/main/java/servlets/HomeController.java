@@ -81,7 +81,7 @@ public class HomeController extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
         List<User> users = mapper.readValue(strJsonData, new TypeReference<List<User>>(){});
         for(User user: users)
-            System.out.println(user.getUsername());
+            System.out.println(user.getUsername() + " "+ user.getPassword());
         return users;
     }
 

@@ -150,13 +150,17 @@ public class DataBase {
 
     }
 
-    public User getUserById(String id)  {
+    public User getUserById(String id) throws Exception{
         if(!users.containsKey(id))
-            return null;
+            throw new UserNotFoundException(id);
         return users.get(id);
     }
 
-    public void setLoggedInUser(String username) {
+    public void setLoggedInUser(String username, String password) throws Exception{
+        if(!users.containsKey(username))
+            throw new UserNotFoundException(username);
+        if(!users.get(username).getPassword().equals(password))
+            throw  new InvalidPasswordException();
         this.loggedInUser = users.get(username);
     }
 

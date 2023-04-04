@@ -20,11 +20,18 @@ public class LoginController extends HttpServlet {
         String name = request.getParameter("username");
         String password = request.getParameter("Password");
         Baloot baloot = Baloot.getInstance();
-        if (baloot.isUserValid(name)) {
-            baloot.loginInUser(name);
-            response.sendRedirect("http://localhost:8080/");
-        } else {
-            response.sendRedirect("http://localhost:8080/login");
+        try {
+            if (baloot.isUserValid(name)) {
+                baloot.loginInUser(name, password);
+                response.sendRedirect("http://localhost:8080/");
+            } else {
+                request.setAttribute("erro", "");
+                response.sendRedirect("http://localhost:8080/login");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 }

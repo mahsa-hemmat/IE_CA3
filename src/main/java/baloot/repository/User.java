@@ -74,14 +74,15 @@ public class User {
     public Map<Integer, Commodity> getPurchasedList(){ return purchasedList; }
 
     public void completePurchase() throws Exception{
-        if(credit < buyList.getTotalCost()) {
-            throw new NotEnoughCreditException("");
-        }
-        credit-=buyList.getTotalCost();
+        if(credit < buyList.getTotalCost())
+            throw new NotEnoughCreditException();
+        if(buyList.getCommodities().isEmpty())
+            throw new BuyListIsEmptyException();
+        credit -= buyList.getTotalCost();
         purchasedList.putAll(buyList.getCommodities());
         for(Commodity commodity:buyList.getCommodities().values())
             commodity.updateInStock();
-        buyList=new BuyList();
+        buyList = new BuyList();
         discounts.get(lastDiscountUsed).setAlreadyUsed(true);
     }
 

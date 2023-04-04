@@ -19,9 +19,12 @@ public class BuyList {
     public BuyList(){
         commodities = new HashMap<>();
     }
+
     public void addCommodity(Commodity commodity) throws Exception{
+        if(!(commodities.containsKey(commodity.getId())))
+            throw new CommodityNotFoundException(commodity.getId());
         if(commodities.containsKey(commodity.getId()))
-            throw new InValidInputException("Commodity is already in the user Buylist.");
+            throw new InValidInputException("Commodity is Already In The User Buy List.");
         commodities.put(commodity.getId() ,commodity);
     }
 

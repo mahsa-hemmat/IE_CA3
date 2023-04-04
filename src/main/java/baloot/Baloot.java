@@ -22,6 +22,10 @@ public class Baloot {
         return instance;
     }
 
+    public DataBase getDataBase(){
+        return db;
+    }
+
     public User getLoggedInUser() {
         return db.getLoggedInUser();
     }
@@ -30,13 +34,14 @@ public class Baloot {
         return db.hasAnyUserLoggedIn();
     }
 
-    public Boolean isUserValid(String username){
+    public Boolean isUserValid(String username) throws Exception{
         return db.getUserById(username) != null;
     }
 
-    public void loginInUser(String username){
-        db.setLoggedInUser(username);
+    public void loginInUser(String username, String password) throws Exception{
+        db.setLoggedInUser(username, password);
     }
+
     public void logOutUser(){db.logOutUser();}
 
     public void addData(List<User> users, List<Provider> providers, List<Commodity> commodities, List<Comment> comments, List<Discount> discounts) throws Exception {
@@ -48,7 +53,5 @@ public class Baloot {
     }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
 
-    public Provider getProvider(int id) throws Exception {
-        return db.getProviderById(id);
-    }
+    public Provider getProvider(int id) throws Exception { return db.getProviderById(id); }
 }

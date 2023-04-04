@@ -1,6 +1,7 @@
 package servlets;
 
 import baloot.Baloot;
+import baloot.repository.Provider;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -11,17 +12,24 @@ import java.io.IOException;
 public class ProviderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String providerId = request.getPathInfo().substring(1);
-        Baloot baloot = Baloot.getInstance();
-        if (baloot.hasAnyUserLoggedIn()) {
-            request.getRequestDispatcher(String.format("/provider.jsp?provider_id=%s",request.getPathInfo().substring(1))).forward(request, response);
-        } else {
-            response.sendRedirect("http://localhost:8080/login");
+        try {
+            String providerId = request.getPathInfo().substring(1);
+            Baloot baloot = Baloot.getInstance();
+            baloot.getProvider(Integer.parseInt(providerId));
+            if (baloot.hasAnyUserLoggedIn()) {
+                request.setAttribute("providers_id", providerId);
+                request.getRequestDispatcher("/provider.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("http://localhost:8080/login");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
     }
 }

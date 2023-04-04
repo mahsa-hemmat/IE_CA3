@@ -15,7 +15,7 @@
 <body>
 <form method="post" action="">
     <label>Credits:</label>
-    <input name="credit" type="text" />
+    <input name="credit" type="text" required/>
     <br>
     <button type="submit">Add credits</button>
 </form>

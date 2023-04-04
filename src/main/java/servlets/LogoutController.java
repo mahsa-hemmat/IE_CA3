@@ -14,8 +14,11 @@ public class LogoutController extends HttpServlet {
         Baloot baloot = Baloot.getInstance();
         if (baloot.hasAnyUserLoggedIn()) {
             baloot.logOutUser();
+            response.sendRedirect("http://localhost:8080/login");
+        } else {
+            request.setAttribute("error", "No User Has Logged In");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        response.sendRedirect("http://localhost:8080/login");
     }
 
     @Override
