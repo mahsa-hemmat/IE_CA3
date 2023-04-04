@@ -10,7 +10,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    String providerId = request.getParameter("provider_id");
+    String providerId = (String) request.getAttribute("providers_id");
     Provider provider = Baloot.getInstance().getProvider(Integer.parseInt(providerId));
 %>
 <html lang="en">
