@@ -78,12 +78,17 @@ public class User {
             throw new NotEnoughCreditException();
         if(buyList.getCommodities().isEmpty())
             throw new BuyListIsEmptyException();
+        for(Commodity commodity:buyList.getCommodities().values()) {
+            if (commodity.getInStock() == 0)
+                throw new OutOfStockException(commodity.getId());
+        }
         credit -= buyList.getTotalCost();
         purchasedList.putAll(buyList.getCommodities());
         for(Commodity commodity:buyList.getCommodities().values())
             commodity.updateInStock();
         buyList = new BuyList();
-        discounts.get(lastDiscountUsed).setAlreadyUsed(true);
+        if(lastDiscountUsed != null)
+            discounts.get(lastDiscountUsed).setAlreadyUsed(true);
     }
 
     public void addDiscount(Discount discount){

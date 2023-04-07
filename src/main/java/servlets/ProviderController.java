@@ -15,8 +15,8 @@ public class ProviderController extends HttpServlet {
         try {
             String providerId = request.getPathInfo().substring(1);
             Baloot baloot = Baloot.getInstance();
-            baloot.getProvider(Integer.parseInt(providerId));
             if (baloot.hasAnyUserLoggedIn()) {
+                baloot.getProvider(Integer.parseInt(providerId));
                 request.setAttribute("providers_id", providerId);
                 request.getRequestDispatcher("/provider.jsp").forward(request, response);
             } else {

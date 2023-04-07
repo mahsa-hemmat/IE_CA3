@@ -1,14 +1,28 @@
 package baloot.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import baloot.exception.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommodityList {
     Map<Integer, Commodity> commodities;
+    Map<String, List<String>> filters;
 
-    public CommodityList() {commodities = new HashMap<>();}
+    public Map<Integer, Commodity> getCommodities() {
+        return commodities;
+    }
+
+    public CommodityList() {
+        commodities = new HashMap<>();
+        filters = new HashMap<String, List<String>>() {
+            {
+                put ("name", new ArrayList<>());
+                put ("category", new ArrayList<>());
+            }
+        };
+    }
+
     public Commodity getCommodityById(int id) throws Exception{
         if(!(commodities.containsKey(id)))
             throw new CommodityNotFoundException(id);
@@ -20,14 +34,57 @@ public class CommodityList {
                 commodities.put(co.getId(), co);
     }
 
-    public List<Commodity> getList() throws Exception{
-        return new ArrayList<Commodity>(commodities.values());
+    public void addFilter(String filter, String filterName){
+        for(String key:filters.keySet()) {
+            if(key.equals(filterName)) {
+                filters.get(filterName).add(filter);
+            }
+        }
     }
 
-    public List<Commodity> filterByCategory(ArrayList<String> cat) throws Exception{
+    public void clearFilter(){
+        for(String key:filters.keySet()) {
+            filters.get(key).clear();
+        }
+    }
+
+    public List<Commodity> getList() throws Exception{
+        List<Commodity> filteredCommodities = new ArrayList<>();
+        if(filters.get("name").isEmpty() && !filters.get("category").isEmpty())
+            filteredCommodities.addAll(filterByCategory(filters.get("category")));
+        else if(!filters.get("name").isEmpty() && filters.get("category").isEmpty())
+            filteredCommodities.addAll(filterByName(filters.get("name")));
+        else if(filters.get("name").isEmpty() && filters.get("category").isEmpty())
+            filteredCommodities.addAll(commodities.values());
+        else {
+            filteredCommodities.addAll(filterByName(filters.get("name")));
+            filteredCommodities.retainAll(filterByCategory(filters.get("category")));
+        }
+        return filteredCommodities;
+    }
+
+    private List<Commodity> filterByName(List<String> names) {
+        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
+        List<Commodity> nameFiltered = new ArrayList<>();
+        for(int i = 0; i < names.size(); i++) {
+            String substring = names.get(i);
+            if (i == 0) {
+                nameFiltered.addAll(allCommodities.stream()
+                        .filter(c -> c.getName().toLowerCase().contains(substring))
+                        .collect(Collectors.toList()));
+            } else {
+                nameFiltered = (nameFiltered.stream()
+                        .filter(c -> c.getName().toLowerCase().contains(substring))
+                        .collect(Collectors.toList()));
+            }
+        }
+        return nameFiltered;
+    }
+
+    public List<Commodity> filterByCategory(List<String> cat) throws Exception{
         List<Commodity> list= new ArrayList<Commodity>();
         for(Commodity co : commodities.values())
-            if(co.getCategories().equals(cat))
+            if(co.getCategories().containsAll(cat))
                 list.add(co);
         return list;
     }
@@ -38,12 +95,12 @@ public class CommodityList {
 
     public void voteComment(String id, int vote) throws Exception {
         for(Commodity commodity: commodities.values()){
-            if(commodity.getComments().containsKey(Integer.parseInt(id))){
-                commodity.getComments().get(Integer.parseInt(id)).addLikeDislike(vote);
-                break;
+            if(commodity.getComments().containsKey(UUID.fromString(id))){
+                commodity.getComments().get(UUID.fromString(id)).addLikeDislike(vote);
+                return;
             }
         }
-        throw new CommandNotFoundException("id");
+        throw new CommentNotFoundException("id");
     }
 
     public List<Commodity> filterByPrice(int start, int end) {
@@ -53,4 +110,23 @@ public class CommodityList {
                 list.add(co);
         return list;
     }
+
+    public void sortByRate() {
+        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
+        Collections.sort(allCommodities, Collections.reverseOrder(Comparator.comparing(Commodity::getRating)));
+        Map<Integer, Commodity> sorted = new LinkedHashMap<>();
+        for(Commodity co:allCommodities)
+            sorted.put(co.getId(), co);
+        commodities = sorted;
+    }
+
+    public void sortByPrice() {
+        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
+        Collections.sort(allCommodities, Collections.reverseOrder(Comparator.comparing(Commodity::getPrice)));
+        Map<Integer, Commodity> sorted = new LinkedHashMap<>();
+        for(Commodity co:allCommodities)
+            sorted.put(co.getId(), co);
+        commodities = sorted;
+    }
+
 }
