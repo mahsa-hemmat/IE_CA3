@@ -35,11 +35,17 @@ public class CommodityList {
     }
 
     public void addFilter(String filter, String filterName){
-        for(String key:filters.keySet()) {
-            if(key.equals(filterName)) {
-                filters.get(filterName).add(filter);
-            }
-        }
+        List<String> temp = new ArrayList<>();
+        filter = filter.toLowerCase().trim().replaceAll("\\s+", " ");
+        if (filter.contains(","))
+            temp = Arrays.asList(filter.trim().split("\\s*,\\s*"));
+        for(String key:filters.keySet())
+            if(key.equals(filterName))
+                if(temp.isEmpty())
+                    filters.get(filterName).add(filter);
+                else
+                    for(String f:temp)
+                        filters.get(filterName).add(f);
     }
 
     public void clearFilter(){
@@ -83,9 +89,12 @@ public class CommodityList {
 
     public List<Commodity> filterByCategory(List<String> cat) throws Exception{
         List<Commodity> list= new ArrayList<Commodity>();
-        for(Commodity co : commodities.values())
-            if(co.getCategories().containsAll(cat))
+        for(Commodity co : commodities.values()) {
+            List<String> tempList = new ArrayList<>(co.getCategories());
+            tempList.replaceAll(String::toLowerCase);
+            if (tempList.containsAll(cat))
                 list.add(co);
+        }
         return list;
     }
     

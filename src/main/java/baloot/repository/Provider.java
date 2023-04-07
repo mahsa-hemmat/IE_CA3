@@ -51,7 +51,7 @@ public class Provider {
         //rating = ((rating*commodities.size()-1) + newCommodity.getRating()) / commodities.size();
     }
 
-    private void calRating(){
+    public void calRating(){
         double sum = 0;
         for(int i = 0 ; i < commodities.size(); i++) {
             sum += commodities.get(i).getRating();

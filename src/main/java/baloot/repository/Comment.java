@@ -16,7 +16,6 @@ public class Comment {
     public String getDate() {
         return date;
     }
-    //private Map<String, Integer> votes = new HashMap<>();;
     public Comment(){};
     public Comment(String userEmail, int commodityId, String text, String date){
         this.userEmail = userEmail;
@@ -39,7 +38,7 @@ public class Comment {
     public String getUserEmail() {
         return userEmail;
     }
-    public Integer getcommodityId() {
+    public Integer getCommodityId() {
         return commodityId;
     }
     public String getText() {

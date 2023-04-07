@@ -24,12 +24,22 @@ public class Commodity {
     @JsonIgnore
     Map<UUID,Comment> comments = new HashMap<>();
 
-    public Map<UUID, Comment> getComments() {
-        return comments;
-    }
 
     public Commodity(){}
 
+    public Commodity(int id, String name, int providerId, int price, List<String> categories,
+                     double rating, int inStockCount){
+        this.id = id;
+        this.name = name;
+        this.providerId = providerId;
+        this.price = price;
+        this.categories = categories;
+        this.rating = rating;
+        this.inStock = inStockCount;
+    }
+    public Map<UUID, Comment> getComments() {
+        return comments;
+    }
     public void addComment(Comment comment){
         comments.put(comment.getId(), comment);
     }
@@ -49,35 +59,8 @@ public class Commodity {
         return providerId;
     }
 
-    public void setProviderId(int providerId) {
-        this.providerId = providerId;
-    }
-
     public int getPrice() {
         return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
-    }
-
-    public void setInStock(int inStock) {
-        this.inStock = inStock;
-    }
-
-    public Commodity(int id, String name, int providerId, int price, List<String> categories,
-                     double rating, int inStockCount){
-        this.id = id;
-        this.name = name;
-        this.providerId = providerId;
-        this.price = price;
-        this.categories = categories;
-        this.rating = rating;
-        this.inStock = inStockCount;
     }
 
     public void updateInStock(){

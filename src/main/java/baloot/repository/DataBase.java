@@ -1,6 +1,5 @@
 package baloot.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import baloot.exception.*;
 
 
@@ -82,6 +81,7 @@ public class DataBase {
         int update=users.get(loggedInUser.getUsername()).getRating(score,commodityId);
         Commodity commodity = commodities.getCommodityById(commodityId);
         commodity.updateRating(update,newRating);
+        providers.get(commodity.getProviderId()).calRating();
     }
 
     public void increaseCredit(int amount){
@@ -109,7 +109,7 @@ public class DataBase {
     public void addComment(List<Comment> comments) throws Exception {
         for(int i = 0; i<comments.size() ; i++){
             Comment comment = comments.get(i);
-            int commodityId = comment.getcommodityId();
+            int commodityId = comment.getCommodityId();
             if(!commodities.hasCommodity(commodityId))
                 throw new CommodityNotFoundException(commodityId);
             commodities.getCommodityById(commodityId).addComment(comment);
