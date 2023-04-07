@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import baloot.exception.*;
 
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -48,36 +49,37 @@ public class DataBase {
             if(!(providers.containsKey(commodity.getProviderId())))
                 throw new ProviderNotFoundException(commodity.getProviderId());
             else {
+                commodity.setTotalRating(commodity.getRating());
                 commodities.addCommodity(commodity);
                 providers.get(commodity.getProviderId()).addNewCommodity(commodity);
             }
     }
 
-    public void addToBuyList(int commodityId, String username) throws Exception{
+    public void addToBuyList(int commodityId) throws Exception{
         if(commodities.getCommodityById(commodityId).getInStock() == 0)
             throw new OutOfStockException(commodityId);
         if(!(commodities.hasCommodity(commodityId)))
             throw new CommodityNotFoundException(commodityId);
-        if(!(users.containsKey(username)))
+        if(!(users.containsKey(loggedInUser.getUsername())))
             throw new UserNotFoundException("no user with given username is found");
-        users.get(username).getBuyList().addCommodity(commodities.getCommodityById(commodityId));
+        users.get(loggedInUser.getUsername()).getBuyList().addCommodity(commodities.getCommodityById(commodityId));
     }
 
-    public void removeFromBuyList(int commodityId, String username) throws Exception{
-        if(!(users.containsKey(username)))
+    public void removeFromBuyList(int commodityId) throws Exception{
+        if(!(users.containsKey(loggedInUser.getUsername())))
             throw new UserNotFoundException("no user with given username is found");
-        users.get(username).getBuyList().removeCommodity(commodityId);
+        users.get(loggedInUser.getUsername()).getBuyList().removeCommodity(commodityId);
     }
 
-    public void rateCommodity(int commodityId, String username, int score) throws Exception{
+    public void rateCommodity(int commodityId, int score) throws Exception{
         if( (score<1) || (score > 10))
             throw new ScoreOutOfBoundsException("score range is from 1 to 10.");
-        if(!(users.containsKey(username)))
+        if(!(users.containsKey(loggedInUser.getUsername())))
             throw new UserNotFoundException("no user with given username is found");
         if(!(commodities.hasCommodity(commodityId)))
             throw new CommodityNotFoundException(commodityId);
-        boolean newRating=!users.get(username).hasRating(commodityId);
-        int update=users.get(username).getRating(score,commodityId);
+        boolean newRating=!users.get(loggedInUser.getUsername()).hasRating(commodityId);
+        int update=users.get(loggedInUser.getUsername()).getRating(score,commodityId);
         Commodity commodity = commodities.getCommodityById(commodityId);
         commodity.updateRating(update,newRating);
     }
@@ -86,33 +88,6 @@ public class DataBase {
         users.get(loggedInUser.getUsername()).increaseCredit(amount);
     }
 
-    public void rateCommodity(JsonNode data) throws Exception{
-        System.out.println(data.get("score").asInt());
-        if( (data.get("score").asInt()<1) || (data.get("score").asInt() > 10))
-            throw new ScoreOutOfBoundsException("score range is from 1 to 10.");
-        if(!(users.containsKey(data.get("username").asText())))
-            throw new UserNotFoundException("no user with given username is found");
-        if(!(commodities.hasCommodity(data.get("commodityId").asInt())))
-            throw new CommodityNotFoundException(data.get("commodityId").asInt());
-        boolean newRating=!users.get(data.get("username").asText()).hasRating(data.get("commodityId").asInt());
-        int update=users.get(data.get("username").asText()).getRating(data.get("score").asInt(),data.get("commodityId").asInt());
-        Commodity commodity = commodities.getCommodityById(data.get("commodityId").asInt());
-        commodity.updateRating(update,newRating);
-    }
-    public void addToBuyList(JsonNode data) throws Exception{
-        if(commodities.getCommodityById(data.get("commodityId").asInt()).getInStock() == 0)
-            throw new OutOfStockException(data.get("commodityId").asInt());
-        if(!(commodities.hasCommodity(data.get("commodityId").asInt())))
-            throw new CommodityNotFoundException(data.get("commodityId").asInt());
-        if(!(users.containsKey(data.get("username").asText())))
-            throw new UserNotFoundException("no user with given username is found");
-        users.get(data.get("username").asText()).getBuyList().addCommodity(commodities.getCommodityById(data.get("commodityId").asInt()));
-    }
-    public void removeFromBuyList(JsonNode data) throws Exception{
-        if(!(users.containsKey(data.get("username").asText())))
-            throw new UserNotFoundException("no user with given username is found");
-        users.get(data.get("username").asText()).getBuyList().removeCommodity(data.get("commodityId").asInt());
-    }
     public Commodity getCommodityById(int id) throws Exception{
         if(!(commodities.hasCommodity(id)))
             throw new CommodityNotFoundException(id);
@@ -137,9 +112,17 @@ public class DataBase {
             int commodityId = comment.getcommodityId();
             if(!commodities.hasCommodity(commodityId))
                 throw new CommodityNotFoundException(commodityId);
-            comment.setId(i+1);
             commodities.getCommodityById(commodityId).addComment(comment);
         }
+    }
+
+    public void addComment(String text, int commodityId) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String date= formatter.format(new Date());
+        Comment comment = new Comment(loggedInUser.getEmail(), commodityId, text, date);
+        if(!commodities.hasCommodity(commodityId))
+            throw new CommodityNotFoundException(commodityId);
+        commodities.getCommodityById(commodityId).addComment(comment);
     }
 
     public String getUserByEmail(String userEmail) throws UserNotFoundException {
@@ -184,8 +167,30 @@ public class DataBase {
 
     public void addDiscount(List<Discount> discounts) {
         for(User user: users.values()){
-            for (Discount discount : discounts)
-                user.addDiscount(discount);
+            for (Discount discount : discounts) {
+                Discount userDiscount = new Discount(discount);
+                user.addDiscount(userDiscount);
+            }
         }
+    }
+
+    public List<Commodity> recommenderSystem(int commodityId) throws Exception {
+        Map<Commodity, Double> scores = new HashMap<>();
+        for(Commodity commodity : commodities.getCommodities().values()) {
+            if(commodity.getId() == commodityId)
+                continue;
+            double score = 0;
+            if (commodity.getCategories().equals(commodities.getCommodityById(commodityId).getCategories()))
+                score = 11 + commodity.getRating();
+            else
+                score = commodity.getRating();
+            scores.put(commodity, score);
+        }
+        Map<Commodity, Double> sortedScores = new LinkedHashMap<>();
+        scores.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> sortedScores.put(x.getKey(), x.getValue()));
+        List<Commodity> recommended = new ArrayList<>(sortedScores.keySet()).subList(0, Math.min(sortedScores.size(), 5));
+        return recommended;
     }
 }

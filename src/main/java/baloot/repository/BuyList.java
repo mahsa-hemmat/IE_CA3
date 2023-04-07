@@ -21,8 +21,6 @@ public class BuyList {
     }
 
     public void addCommodity(Commodity commodity) throws Exception{
-        if(!(commodities.containsKey(commodity.getId())))
-            throw new CommodityNotFoundException(commodity.getId());
         if(commodities.containsKey(commodity.getId()))
             throw new InValidInputException("Commodity is Already In The User Buy List.");
         commodities.put(commodity.getId() ,commodity);
@@ -43,7 +41,7 @@ public class BuyList {
         for(Commodity co:commodities.values()){
             totalPrice += co.getPrice();
         }
-        totalPrice -= (discount/100) * totalPrice;
+        totalPrice -= (discount * totalPrice) / 100;
         return totalPrice;
     }
 

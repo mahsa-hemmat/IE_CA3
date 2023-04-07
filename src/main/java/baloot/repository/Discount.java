@@ -6,9 +6,13 @@ public class Discount {
     private Boolean alreadyUsed = false;
 
     public Discount(){}
-    public Discount(String discountCode, int discount, Boolean alreadyUsed){
+    public Discount(String discountCode, int discount){
         this.discountCode = discountCode;
         this.discount = discount;
+    }
+    public Discount(Discount discount){
+        this.discountCode = discount.discountCode;
+        this.discount = discount.discount;
     }
 
     public int getDiscount() {

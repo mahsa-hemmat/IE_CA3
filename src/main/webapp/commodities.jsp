@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@page import="baloot.Baloot"%>
 <%@ page import="baloot.repository.Commodity" %>
+<%@ page import="java.util.List" %>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +20,7 @@
     <form action="" method="POST">
         <label>Search:</label>
         <input type="text" name="search" value="">
-        <button type="submit" name="action" value="search_by_category">Search By Cagtegory</button>
+        <button type="submit" name="action" value="search_by_category">Search By Category</button>
         <button type="submit" name="action" value="search_by_name">Search By Name</button>
         <button type="submit" name="action" value="clear">Clear Search</button>
     </form>
@@ -27,6 +28,11 @@
     <form action="" method="POST">
         <label>Sort By:</label>
         <button type="submit" name="action" value="sort_by_rate">Rate</button>
+    </form>
+    <br><br>
+    <form action="" method="POST">
+        <label>Sort By:</label>
+        <button type="submit" name="action" value="sort_by_price">Price</button>
     </form>
     <br><br>
     <table>
@@ -51,7 +57,7 @@
         <tr>
             <td><%=commodity.getId()%></td>
             <td><%=commodity.getName()%></td>
-            <td><%=Baloot.getInstance().getProvider(commodity.getProviderId())%></td>
+            <td><%=Baloot.getInstance().getProvider(commodity.getProviderId()).getName()%></td>
             <td><%=commodity.getPrice()%></td>
             <td><%=temp%></td>
             <td><%=commodity.getRating()%></td>

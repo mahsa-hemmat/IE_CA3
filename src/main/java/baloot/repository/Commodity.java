@@ -18,12 +18,18 @@ public class Commodity {
     private double rating;
     private int inStock;
     @JsonIgnore
-    private List<Double> totalRating = new ArrayList<>();
-    Map<Integer,Comment> comments = new HashMap<>();
-    public Map<Integer, Comment> getComments() {
+    private double totalRating = 0;
+    @JsonIgnore
+    private int ratingCount = 1;
+    @JsonIgnore
+    Map<UUID,Comment> comments = new HashMap<>();
+
+    public Map<UUID, Comment> getComments() {
         return comments;
     }
+
     public Commodity(){}
+
     public void addComment(Comment comment){
         comments.put(comment.getId(), comment);
     }
@@ -72,7 +78,6 @@ public class Commodity {
         this.categories = categories;
         this.rating = rating;
         this.inStock = inStockCount;
-        totalRating.add(rating);
     }
 
     public void updateInStock(){
@@ -98,13 +103,14 @@ public class Commodity {
     public void setRating(double rating){
         this.rating = rating;
     }
-    public void updateRating(double rate,boolean newRating){
-        totalRating.add(rate);
-        double sum = rating;
-        for(double num:totalRating) {
-            sum += num;
-        }
-        rating = sum/(totalRating.size()+1);
+    public void updateRating(double rating,boolean newRating){
+        totalRating+=rating;
+        if(newRating)
+            ratingCount+=1;
+        this.rating = totalRating / ratingCount;
     }
 
+    public void setTotalRating(double totalRating) {
+        this.totalRating = totalRating;
+    }
 }

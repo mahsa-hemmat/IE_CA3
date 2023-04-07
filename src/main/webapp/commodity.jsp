@@ -2,10 +2,11 @@
 <%@page import="baloot.Baloot"%>
 <%@ page import="baloot.repository.Commodity" %>
 <%@ page import="baloot.repository.Comment" %>
+<%@ page import="java.util.List" %>
 <html lang="en">
 <%
-    String providerId = (String) request.getAttribute("providers_id");
-    Provider provider = Baloot.getInstance().getProvider(Integer.parseInt(providerId));
+    String commodityId = (String) request.getAttribute("commodity_id");
+    Commodity commodity = Baloot.getInstance().getDataBase().getCommodityById(Integer.parseInt(commodityId));
 %>
   <head>
     <meta charset="UTF-8" />
@@ -26,9 +27,15 @@
     <ul>
       <li id="id">Id: <%=commodity.getId()%></li>
       <li id="name">Name: <%=commodity.getName()%></li>
-      <li id="providerName">Provider Name: <%=Baloot.getInstance().getProvider(commodity.getProviderId())%></li>
+      <li id="providerName">Provider Name: <%=Baloot.getInstance().getProvider(commodity.getProviderId()).getName()%></li>
       <li id="price">Price: <%=commodity.getPrice()%></li>
-      <li id="categories">Categories: <%=commodity.getCategories()%></li>
+        <%
+            List<String> categories = commodity.getCategories();
+                String temp = categories.get(0);
+                for(int i = 1; i < categories.size(); i++)
+                    temp += ", " + categories.get(i);
+        %>
+      <li id="categories">Categories: <%=temp%></li>
       <li id="rating">Rating: <%=commodity.getRating()%></li>
       <li id="inStock">In Stock: <%=commodity.getInStock()%></li>
     </ul>
@@ -36,17 +43,17 @@
     <label>Add Your Comment:</label>
     <form action="" method="post">
       <input type="text" name="comment" value="" />
-      <button type="submit">submit</button>
+      <button type="submit" name="action" value="comment">submit</button>
     </form>
     <br>
     <form action="" method="POST">
       <label>Rate(between 1 and 10):</label>
       <input type="number" id="quantity" name="quantity" min="1" max="10">
-      <button type="submit">Rate</button>
+      <button type="submit" name="action" value="rate">Rate</button>
     </form>
     <br>
     <form action="" method="POST">
-      <button type="submit">Add to BuyList</button>
+      <button type="submit" name="action" value="add">Add to BuyList</button>
     </form>
     <br />
     <table>
@@ -59,37 +66,39 @@
         <th>dislikes</th>
       </tr>
       <%
-            for (Comment comment : commodity.getComments.values()) {
+            for (Comment comment : commodity.getComments().values()) {
+                String username = Baloot.getInstance().getDataBase().getUserByEmail(comment.getUserEmail());
       %>
       <tr>
-        <td><%=comment.getUserEmail()%></td>
+        <td><%=username%></td>
         <td><%=comment.getText()%></td>
         <td><%=comment.getDate()%></td>
         <td>
           <form action="" method="POST">
-            <label for="">2</label>
+            <label for=""><%=comment.getLike()%></label>
             <input
               id="form_comment_id"
               type="hidden"
               name="comment_id"
-              value="1"
+              value="<%=comment.getId()%>"
             />
-            <button type="submit">like</button>
+            <button type="submit" name="action" value="like">like</button>
           </form>
         </td>
         <td>
           <form action="" method="POST">
-            <label for="">1</label>
+            <label for=""><%=comment.getDislike()%></label>
             <input
               id="form_comment_id"
               type="hidden"
               name="comment_id"
-              value="-1"
+              value="<%=comment.getId()%>"
             />
-            <button type="submit">dislike</button>
+            <button type="submit" name="action" value="dislike">dislike</button>
           </form>
         </td>
       </tr>
+        <%}%>
     </table>
     <br><br>
     <table>
@@ -104,46 +113,24 @@
             <th>In Stock</th>
             <th>Links</th>
         </tr>
+        <%
+            for (Commodity recommended : Baloot.getInstance().getDataBase().recommenderSystem(Integer.parseInt(commodityId))) {
+                List<String> cat = recommended.getCategories();
+                temp = categories.get(0);
+                for(int i = 1; i < cat.size(); i++)
+                    temp += ", " + cat.get(i);
+        %>
         <tr>
-            <td>2341</td>
-            <td>Galaxy S22</td>
-            <td>Phone Provider No.1</td>
-            <td>34000000</td>
-            <td>Technology, Phone</td>
-            <td>8.3</td>
-            <td>17</td>
-            <td><a href="/commodities/2341">Link</a></td>
+            <td><%=recommended.getId()%></td>
+            <td><%=recommended.getName()%></td>
+            <td><%=Baloot.getInstance().getProvider(recommended.getProviderId()).getName()%></td>
+            <td><%=recommended.getPrice()%></td>
+            <td><%=temp%></td>
+            <td><%=recommended.getRating()%></td>
+            <td><%=recommended.getInStock()%></td>
+            <td><a href="/commodities/<%=recommended.getId()%>">Link</a></td>
         </tr>
-        <tr>
-            <td>4231</td>
-            <td>Galaxy S22 Plus</td>
-            <td>Phone Provider No.1</td>
-            <td>43000000</td>
-            <td>Technology, Phone</td>
-            <td>8.7</td>
-            <td>12</td>
-            <td><a href="/commodities/4231">Link</a></td>
-        </tr>
-        <tr>
-          <td>1234</td>
-          <td>Galaxy S22 Ultra</td>
-          <td>Phone Provider No.2</td>
-          <td>50000000</td>
-          <td>Technology, Phone</td>
-          <td>8.9</td>
-          <td>5</td>
-          <td><a href="/commodities/1234">Link</a></td>
-      </tr>
-      <tr>
-          <td>4321</td>
-          <td>Galaxy A53</td>
-          <td>Phone Provider No.2</td>
-          <td>16000000</td>
-          <td>Technology, Phone</td>
-          <td>8.7</td>
-          <td>11</td>
-          <td><a href="/commodities/4321">Link</a></td>
-      </tr>
+        <%}%>
     </table>
   </body>
 </html>
